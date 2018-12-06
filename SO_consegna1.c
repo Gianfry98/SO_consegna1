@@ -1,8 +1,6 @@
 /* -Versione definitiva del programma . In questa implementazione le stringhe path_name e file_name 
    -vengono allocate dinamicamente per evitare l'errore "stack smashing". Il programma lista anche le directory nascoste. 
-
-   -Impossibile ottenere un lista di tutti i file a partire dalla root. 
- 
+   
    -Il path name indicato per ogni file non e' "assoluto" in quando contiene il path fino al nome della directory contenente 
    -non inglobando in esso il nome del file stesso. 
 	 */
@@ -21,7 +19,6 @@
 #define MAXPATH 128
 #define MAXFILE 64
 
-char path[MAXPATH];
 //lista dei file
 
 typedef struct n1{
@@ -55,6 +52,8 @@ void init_lista(p_lista_generale *lista){
 void modifica_path(p_lista_generale *dir);
 
 int main(int narg, char* args[1]){
+char path[MAXPATH];
+char x = '/';
 num_core = get_nprocs();//restituisce il numero di core, presente nella libreria <sys/sysinfo.h>
 int is_dir; //flag che indica se il file e' una directory o meno
 char path_temporaneo[MAXPATH];
@@ -68,6 +67,10 @@ for(int i=0;i<num_core;i++)
 	controllo[i] = 0;
 pthread_mutex_lock(&mutex_lista);
 strcpy(path_temporaneo,args[1]);
+if(strlen(path_temporaneo) == 1){
+	printf("Impossibile fare il listing della directory %c \n", x);
+	exit(EXIT_FAILURE);
+}
 if(strlen(path_temporaneo)!= 1 && path_temporaneo[strlen(path_temporaneo)-1] == '/')
 	strncpy(path,path_temporaneo,strlen(path_temporaneo)-1);
 else 
@@ -84,6 +87,7 @@ if((directory = opendir(path)) != NULL){
 }else
 {
 	perror("Path errato o inesistente");
+
 	exit(EXIT_FAILURE);
 }
 for(int i=0;i<num_core;i++){

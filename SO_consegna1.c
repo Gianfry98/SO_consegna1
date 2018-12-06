@@ -1,4 +1,4 @@
-/* -Versione aggiornata del programma SO_consegna1v1.c . In questa implementazione le stringhe path_name e file_name 
+/* -Versione definitiva del programma . In questa implementazione le stringhe path_name e file_name 
    -vengono allocate dinamicamente per evitare l'errore "stack smashing". Il programma lista anche le directory nascoste. 
 
    -Impossibile ottenere un lista di tutti i file a partire dalla root. 

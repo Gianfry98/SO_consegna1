@@ -17,7 +17,6 @@
 #include <sys/sysinfo.h>
 
 #define MAXPATH 128
-#define MAXFILE 64
 
 //lista dei file
 
@@ -45,16 +44,23 @@ int linka_liste(p_lista_generale *lista,p_lista_generale lista_da_likare);
 int num_core;
 /*variabile di controllo per la terminazione dei thread, 1 se il thread ha letto solo file nella directory,
  0 se sono ancora presenti directory*/ 
-int controllo[20];
+int* controllo;
 void init_lista(p_lista_generale *lista){
 	*lista = NULL;
 }
 void modifica_path(p_lista_generale *dir);
 
 int main(int narg, char* args[1]){
+if(narg == 1){
+	printf("Il programma richiede l'inserimento del path della directory di cui si vuol ottenere la lista.\n");
+	printf("Dunque bisogna inserire il path subito dopo aver digitato ./<nome_eseguibile> \n");
+	printf("-Esempio di avvio --- ./SO_consegna1 /home ---\n");
+	exit(EXIT_FAILURE);
+}
 char path[MAXPATH];
 char x = '/';
 num_core = get_nprocs();//restituisce il numero di core, presente nella libreria <sys/sysinfo.h>
+controllo = (int*)malloc(num_core*sizeof(int));
 int is_dir; //flag che indica se il file e' una directory o meno
 char path_temporaneo[MAXPATH];
 init_lista(&lista_generale);
@@ -71,8 +77,8 @@ if(strlen(path_temporaneo) == 1){
 	printf("Impossibile fare il listing della directory %c \n", x);
 	exit(EXIT_FAILURE);
 }
-if(strlen(path_temporaneo)!= 1 && path_temporaneo[strlen(path_temporaneo)-1] == '/')
-	strncpy(path,path_temporaneo,strlen(path_temporaneo)-1);
+if(path_temporaneo[strlen(path_temporaneo)] == '/')
+	strncpy(path,path_temporaneo,(strlen(path_temporaneo)-1));
 else 
 	strcpy(path,args[1]);
 if((directory = opendir(path)) != NULL){
@@ -217,13 +223,6 @@ int elimina_directory(p_lista_generale *lista,char *nome_file){
 	else 
 		return elimina_directory(&(*lista)->next,nome_file);
 }
-/*void modifica_path(p_lista_generale *dir){
-	char file_name[MAXFILE];
-	strcpy(file_name,(*dir)->file_name);
-	strcat((*dir)->path_name,"/");
-	strcat((*dir)->path_name, file_name);
-	//printf("Ho creato il path %s \n",(*dir)->info.path_name);
-}*/
 p_lista_generale ls_directory(char* path_directory){
 	DIR *dir;
 	int is_dir=0;
